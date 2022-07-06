@@ -4,12 +4,12 @@
   <ul>
     {% for user in users %}
     <li>
-      <a href='/{{user.id}}'>{{ user.first_name }} {{ user.last_name }}</a>
+      <a href='/users/{{user.id}}'>{{user.full_name}}</a>
     </li>
     {% endfor %}
   </ul>
 
-  <form action="/add_user">
+  <form action="users/add_user">
     <button>Add User</button>
   </form>
   

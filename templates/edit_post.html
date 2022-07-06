@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title%} Edit Post{{post.id}} {% endblock %}
+{% block content %}
+
+<h2>Editing Post {{post.id}} </h2>
+
+<form method="POST">
+  <input name="title" type="text" value="{{post.title}}">
+  <input name ="content" type ="text" value="{{post.content}}">
+  <button>Update</button>
+</form>
+
+<form action ='/users/{{user.id}}'>
+<button >Back To Author</button>
+</form>
+{% endblock %}
+
