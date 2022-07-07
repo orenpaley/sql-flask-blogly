@@ -5,11 +5,18 @@
 <h2>Add Post For {{user.full_name}} </h2>
 
 <form method="POST">
+  <label for="title">Title</label>
   <input name="title" type="text">
+  <label for="content">Content</label>
   <input name ="content" type ="text">
-    <button>Add</button>
+  <h3>TAGS</h3>
+  {% for tag in tags%}
+  <input type="checkbox" id='{{tag.id}}' name='tags' value={{tag.id}}>
+  <label for="{{tag.name}}">{{tag.name}}</label><br><br>
+  {% endfor %}
+  <button>Add</button>
 </form>
 
-<button action ='users/{{user.id}}'>Cancel</button>
+<button action ='/tags'>Cancel</button>
 {% endblock %}
 

@@ -2,7 +2,7 @@
 
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import asc, func
+from sqlalchemy import ForeignKey, asc, func
 
 db = SQLAlchemy()
 
@@ -56,10 +56,38 @@ class Post(db.Model):
     
     user_id = db.Column(db.Integer,
                         db.ForeignKey('users.id'))
+
     users = db.relationship('User', backref='posts')
+
+    tags = db.relationship('Tag', secondary='tags_posts', backref='posts')
     
     
-                    
+class Tag(db.Model):
+    __tablename__ = 'tags'  
+
+    id = db.Column(db.Integer,
+                    primary_key=True,
+                    autoincrement=True)
+
+    name = db.Column(db.String(50),
+                     unique=True, 
+                     nullable=False)
+
+    
+
+class TagPost(db.Model):
+    __tablename__ = 'tags_posts'
+
+    tag_id = db.Column(db.Integer, 
+                       db.ForeignKey('tags.id'), 
+                       primary_key=True)
+    
+    post_id = db.Column(db.Integer, 
+                        db.ForeignKey('posts.id'), 
+                        primary_key=True)
+    
+
+    
 
     
      

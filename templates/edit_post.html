@@ -7,6 +7,17 @@
 <form method="POST">
   <input name="title" type="text" value="{{post.title}}">
   <input name ="content" type ="text" value="{{post.content}}">
+
+  <h3>TAGS</h3>
+  {% for tag in tags %}
+  {% if tag in post.tags %}
+  <input type="checkbox" id='{{tag.id}}' name='tags' value={{tag.id}} checked>
+  <label for="{{tag.name}}">{{tag.name}}</label><br><br>
+  {%else %}
+  <input type="checkbox" id='{{tag.id}}' name='tags' value={{tag.id}}>
+  <label for="{{tag.name}}">{{tag.name}}</label><br><br>
+  {% endif %}
+  {% endfor %}
   <button>Update</button>
 </form>
 

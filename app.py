@@ -1,6 +1,6 @@
 """Blogly application."""
 
-from models import Post, db, connect_db, User
+from models import Post, db, connect_db, User, Tag, TagPost
 from flask import Flask, render_template, request, redirect
 from flask_debugtoolbar import DebugToolbarExtension
 
@@ -89,34 +89,46 @@ def delete_user(id):
 @app.route('/users/<id>/posts/new')
 def add_post_form(id):
   user = User.query.get_or_404(id)
-  return render_template('add_post.html', user=user)
+  tags = Tag.query.all()
+  return render_template('add_post.html', user=user, tags=tags)
 
 @app.route('/users/<id>/posts/new', methods=['POST'])
 def post_submit(id):
   title = request.form['title']
   content = request.form['content']
   id = id
+  tags = request.form.getlist('tags')
   post = Post(title=title, content=content, user_id=id)
+  for tag in tags:
+    tag = Tag.query.get(int(tag))
+    post.tags.append(tag)
+ 
 
   db.session.add(post)
   db.session.commit()
 
-  return redirect(f'/{id}')
+  return redirect(f'/users/{id}')
 
 @app.route('/posts/<id>')
 def view_post_details(id):
   post = Post.query.get_or_404(id)
   user = User.query.get(post.user_id)
+  tags = post.tags
 
-
-  return render_template('post.html', user=user, post=post)
+  return render_template('post.html', user=user, post=post, tags=tags)
 
 @app.route('/posts/<id>/edit')
 def get_edit_post(id):
   post = Post.query.get_or_404(id)
   user = User.query.get(post.user_id)
+  post_tags = post.tags
+  tags = Tag.query.all()
 
-  return render_template('edit_post.html', post=post, user=user)
+  return render_template('edit_post.html', 
+                          post=post, 
+                          user=user, 
+                          post_tags=post_tags, 
+                          tags=tags)
 
 @app.route('/posts/<id>/edit', methods=['POST'])
 def post_edit_post(id):
@@ -125,11 +137,13 @@ def post_edit_post(id):
 
   post = Post.query.get_or_404(id)
   user = User.query.get_or_404(post.user_id)
+  
   if title:
     post.title = title 
   if content:
     post.content = content
-  
+
+
   db.session.commit()
 
   return redirect(f'/users/{user.id}')
@@ -140,6 +154,57 @@ def delete_post(id):
   db.session.commit()
 
   return redirect(f'/users')
+
+  #TAGS
+
+@app.route('/tags')
+def list_tags():
+  tags = Tag.query.all()
+  return render_template('tags.html', tags=tags)
+
+@app.route('/tags/<id>')
+def get_tag_info(id):
+  tag = Tag.query.get_or_404(id)
+  posts = tag.posts
+  return render_template('tag.html', tag=tag, posts=posts)
+
+@app.route('/tags/new')
+def add_tag_form():
+  return render_template('add_tag.html')
+
+@app.route('/tags/new', methods=['POST'])
+def post_add_tag():
+  name = request.form['name']
+  new_tag = Tag(name=name)
+  db.session.add(new_tag)
+  db.session.commit()
+
+  return redirect('/tags')
+
+@app.route('/tags/<id>/edit')
+def get_edit_tag(id):
+  tag = Tag.query.get_or_404(id)
+  return render_template('edit_tag.html', tag=tag)
+
+
+@app.route('/tags/<id>/edit', methods = ['POST'])
+def post_edit_tag(id):
+  name = request.form['name']
+  tag = Tag.query.get_or_404(id)
+
+  tag.name = name
+
+  db.session.commit()
+
+  return redirect('/tags')
+
+@app.route('/tags/<id>/delete')
+def delete_tag(id):
+  Tag.query.get_or_404(id).delete()
+
+  db.session.commit()
+
+
 
 
 
